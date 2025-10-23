@@ -9,9 +9,20 @@
 - [x] Implement basic NFC reading functionality in main.dart
 - [x] Fix Android NDK version to 27.0.12077973 for nfc_manager compatibility
 
-## Next Steps
-- [ ] Test the app on a physical device with NFC support
-- [ ] Handle different types of NFC tags (NDEF, MIFARE, etc.)
-- [ ] Add error handling for NFC operations
-- [ ] Improve UI with loading indicators and better feedback
-- [ ] Add functionality to write data to NFC tags (optional)
+## Voting App Development Tasks
+- [x] Add provider dependency to pubspec.yaml for state management
+- [x] Create lib/models/ directory and add Voter, Candidate, Vote models
+- [x] Create lib/providers/ directory and add VotingProvider for state management
+- [x] Refactor main.dart to include voting flow: Authentication -> Voting -> Confirmation
+- [x] Implement NFC authentication screen with loading and error handling
+- [x] Implement voting screen with candidate selection
+- [x] Implement confirmation screen after voting
+- [x] Add validation logic: Check valid NFC IDs (hardcoded list), prevent double voting
+- [x] Update UI with better feedback, loading indicators, and error messages
+- [ ] Test NFC reading and voting flow on a physical device
+
+## Next Steps (Future Enhancements)
+- [ ] Add local storage for votes using shared_preferences
+- [ ] Implement backend integration for centralized voting
+- [ ] Add vote results display
+- [ ] Add admin panel for managing candidates and viewing results

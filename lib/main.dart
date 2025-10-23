@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:nfc_manager/nfc_manager.dart';
+import 'package:provider/provider.dart';
+import 'providers/voting_provider.dart';
+import 'screens/auth_screen.dart';
+import 'screens/voting_screen.dart';
+import 'screens/confirmation_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => VotingProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -11,66 +20,52 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'NFC Reader App',
+      title: 'Sistema de Votação - Faculdade',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'NFC Reader App'),
+      home: const VotingApp(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class VotingApp extends StatefulWidget {
+  const VotingApp({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<VotingApp> createState() => _VotingAppState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  String _nfcData = 'Aproxime uma tag NFC para ler';
+class _VotingAppState extends State<VotingApp> {
+  int _currentStep = 0; // 0: Auth, 1: Voting, 2: Confirmation
 
-  Future<void> _readNfc() async {
-    bool isAvailable = await NfcManager.instance.isAvailable();
-    if (!isAvailable) {
-      setState(() {
-        _nfcData = 'NFC não está disponível neste dispositivo';
-      });
-      return;
-    }
+  void _nextStep() {
+    setState(() {
+      _currentStep++;
+    });
+  }
 
-    NfcManager.instance.startSession(
-      onDiscovered: (NfcTag tag) async {
-        setState(() {
-          _nfcData = 'Tag NFC detectada: ${tag.data}';
-        });
-        NfcManager.instance.stopSession();
-      },
-    );
+  void _reset() {
+    setState(() {
+      _currentStep = 0;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('Sistema de Votação'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              _nfcData,
-              style: Theme.of(context).textTheme.headlineSmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(onPressed: _readNfc, child: const Text('Ler NFC')),
-          ],
-        ),
+      body: IndexedStack(
+        index: _currentStep,
+        children: [
+          AuthScreen(onAuthenticated: _nextStep),
+          VotingScreen(onVoted: _nextStep),
+          ConfirmationScreen(onNewVote: _reset),
+        ],
       ),
     );
   }
